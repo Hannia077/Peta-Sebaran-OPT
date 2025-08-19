@@ -84,8 +84,9 @@ def success_box(msg):
 uploaded_file = st.file_uploader("📤 Upload file Excel/CSV", type=["csv", "xlsx"])
 
 # Baca SHP
-shapefile_path = "C:/Users/LENOVO/OneDrive/Documents/Magang Pertanian/Visualisasi Peta/Data.rar"
-gdf = gpd.read_file(f"zip://{shapefile_path}", engine="fiona")
+
+gdf = gpd.read_file("Data/ADMINISTRASIDESA_AR_25K.shp")
+gdf.to_file("Data/nama_file.geojson", driver="GeoJSON")
 
 # Kolom join
 gdf["DESA_JOIN"] = gdf["NAMOBJ"].astype(str).str.strip().str.upper()
