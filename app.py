@@ -85,7 +85,7 @@ uploaded_file = st.file_uploader("📤 Upload file Excel/CSV", type=["csv", "xls
 
 # Baca SHP
 shapefile_path = "C:/Users/LENOVO/OneDrive/Documents/Magang Pertanian/Visualisasi Peta/Data"
-gdf = gpd.read_file(shapefile_path)
+gdf = gpd.read_file(shapefile_path, engine="fiona")
 
 # Kolom join
 gdf["DESA_JOIN"] = gdf["NAMOBJ"].astype(str).str.strip().str.upper()
