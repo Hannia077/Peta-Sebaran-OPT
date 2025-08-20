@@ -57,7 +57,7 @@ def add_bg_with_overlay(image_file, overlay_alpha=0.55):  # 0 (transparan) - 1 (
     """, unsafe_allow_html=True)
 
 # panggil dengan file lokalmu
-add_bg_with_overlay("C://Users//LENOVO//OneDrive//Dokumen//magang//Visualisasi Peta//bg.png", overlay_alpha=0.55)
+add_bg_with_overlay("bg.png", overlay_alpha=0.55)
 
 # ========= Komponen UI =========
 st.title("Visualisasi Peta Sebaran OPT di Sidoarjo")
@@ -85,8 +85,8 @@ uploaded_file = st.file_uploader("📤 Upload file Excel/CSV", type=["csv", "xls
 
 # Baca SHP
 
-gdf = gpd.read_file("C://Users//LENOVO//OneDrive//Dokumen//magang//Visualisasi Peta//Data//ADMINISTRASIDESA_AR_25K.shp")
-gdf.to_file("C://Users//LENOVO//OneDrive//Dokumen//magang//Visualisasi Peta//Data//filedata.geojson", driver="GeoJSON")
+gdf = gpd.read_file("Data/ADMINISTRASIDESA_AR_25K.shp")
+gdf.to_file("Data/nama_file.geojson", driver="GeoJSON")
 
 # Kolom join
 gdf["DESA_JOIN"] = gdf["NAMOBJ"].astype(str).str.strip().str.upper()
@@ -149,11 +149,7 @@ if uploaded_file is not None:
     if "Semua" not in bulan_filter:
         filtered_df = filtered_df[filtered_df["Bulan"].astype(str).str.upper().isin([str(b).upper() for b in bulan_filter])]
 
-    # merge semua data → dipakai untuk warna abu-abu
-    merged_all = gdf.merge(df, on=["DESA_JOIN", "KECAMATAN_JOIN"], how="left", suffixes=('', '_data'))
-
-    # merge khusus hasil filter → hanya yg lolos filter yg ada tooltip
-    merged_filtered = gdf.merge(filtered_df, on=["DESA_JOIN", "KECAMATAN_JOIN"], how="left", suffixes=('', '_data'))
+    merged = gdf.merge(df, on=["DESA_JOIN", "KECAMATAN_JOIN"], how="left", suffixes=('', '_data'))
 
     # Warna per kecamatan
     kecamatan_unique = gdf["KECAMATAN_JOIN"].dropna().unique()
@@ -230,30 +226,16 @@ if uploaded_file is not None:
 
     # ---------------- Peta (full width, tanpa frame putih) ----------------
     m = folium.Map(location=[-7.45, 112.7], zoom_start=10)
-
-    # Layer semua desa (abu-abu kalau ga masuk filter)
-# Layer semua desa (tanpa tooltip, supaya poligon tetap ada)
     folium.GeoJson(
-        merged_all,
-        name="Semua Desa",
-        style_function=style_function
+        merged,
+        name="Data Desa",
+        style_function=style_function,
+        tooltip=folium.GeoJsonTooltip(
+            fields=tooltip_fields,
+            aliases=tooltip_aliases,
+            localize=True
+        )
     ).add_to(m)
-
-    # Hanya tambahkan tooltip ke desa yang memang punya data
-    merged_with_data = merged_filtered.dropna(subset=["OPT", "Bulan"], how="all")
-
-    if not merged_with_data.empty:
-        folium.GeoJson(
-            merged_with_data,
-            name="Data Filtered",
-            style_function=style_function,
-            tooltip=folium.GeoJsonTooltip(
-                fields=tooltip_fields,
-                aliases=tooltip_aliases,
-                localize=True
-            )
-        ).add_to(m)
-
 
     # bungkus iframe map agar 100% lebar container
     st.markdown('<div class="map-wrap">', unsafe_allow_html=True)
