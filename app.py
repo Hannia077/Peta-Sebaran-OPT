@@ -57,7 +57,7 @@ def add_bg_with_overlay(image_file, overlay_alpha=0.55):  # 0 (transparan) - 1 (
     """, unsafe_allow_html=True)
 
 # panggil dengan file lokalmu
-add_bg_with_overlay("C://Users//LENOVO//OneDrive//Dokumen//magang//Visualisasi Peta//bg.png", overlay_alpha=0.55)
+add_bg_with_overlay("bg.png")
 
 # ========= Komponen UI =========
 st.title("Visualisasi Peta Sebaran OPT di Sidoarjo")
@@ -85,8 +85,8 @@ uploaded_file = st.file_uploader("📤 Upload file Excel/CSV", type=["csv", "xls
 
 # Baca SHP
 
-gdf = gpd.read_file("C://Users//LENOVO//OneDrive//Dokumen//magang//Visualisasi Peta//Data//ADMINISTRASIDESA_AR_25K.shp")
-gdf.to_file("C://Users//LENOVO//OneDrive//Dokumen//magang//Visualisasi Peta//Data//filedata.geojson", driver="GeoJSON")
+gdf = gpd.read_file("Data/ADMINISTRASIDESA_AR_25K.shp")
+gdf.to_file("filedata.geojson")
 
 # Kolom join
 gdf["DESA_JOIN"] = gdf["NAMOBJ"].astype(str).str.strip().str.upper()
